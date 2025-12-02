@@ -1,0 +1,173 @@
+#:kivy 1.0.6
+
+<Fish>:
+    canvas:
+        Rectangle:
+            source: root.image_source
+            pos: self.pos
+            size: root.fish_size, root.fish_size
+
+<FishingLine>:
+    size_hint: None, None
+    size: 20, 80
+    canvas:
+        Rectangle:
+            source: "images/KAIL MERAH.png"  # ← ganti dengan path gambarmu
+            pos: self.center_x - 15, self.y - 30  # sesuaikan offset
+            size: (120, 120)
+        Color:
+            rgba: 0.5, 0.5, 0.5, 1
+        Line:
+            points: self.center_x, self.top + 30, self.center_x, self.y
+            width: 1
+        
+<MenuScreen>:
+    Image:
+        source: "images/QUICK HOOK.png"
+        allow_stretch: True
+        keep_ratio: False
+        size: root.size
+        pos: root.pos
+
+    FloatLayout:
+        Button:
+            size_hint: 0.3, 0.15
+            pos_hint: {"center_x": 0.5, "center_y": 0.55}
+            background_color: 0, 0, 0, 0
+            on_press: root.start_game()
+
+        Button:
+            text: "Exit"
+            size_hint: 0.12, 0.06
+            pos_hint: {"right": 0.98, "top": 0.1}
+            on_press: app.stop()
+
+<PlayerMenuScreen>:
+    Image:
+        source: "images/player.jpg"
+        allow_stretch: True
+        keep_ratio: False
+        size: root.size
+        
+    FloatLayout:
+        Button:
+            size_hint: 0.25, 0.4
+            pos_hint: {"center_x": 0.3, "center_y": 0.5}
+            background_color: 0, 0, 0, 0
+            on_press: root.start_game_solo()
+
+        Button:
+            size_hint: 0.25, 0.4
+            pos_hint: {"center_x": 0.7, "center_y": 0.5}
+            background_color: 0, 0, 0, 0
+            on_press: root.start_game_vs()
+
+        Button:
+            text: "Back"
+            size_hint: 0.12, 0.06
+            pos_hint: {"right": 0.98, "top": 0.1}
+            on_press: root.manager.current = "menu"
+
+<GameScreen>:
+    player1_line: p1_line 
+    player2_line: p2_line 
+    fish_layer: fish_layer
+
+    canvas.before:
+        Rectangle:
+            source: "images/laut.jpg"
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        id: game_layout
+
+        FloatLayout:
+            id: fish_layer
+            size: root.size
+            pos: root.pos
+
+        Button:
+            text: "Back"
+            size_hint: 0.12, 0.06
+            pos_hint: {"right": 0.98, "top": 0.1}
+            on_press: root.manager.current = "player_menu"
+
+        Label:
+            text: "Time: %ds" % root.time_left
+            font_size: "30sp"
+            pos_hint: {"center_x": 0.5, "top": 1.45}
+            color: 1, 1, 1, 1
+
+        Label:
+            text: "Player 1: %d" % root.score1
+            font_size: "22sp"
+            pos_hint: {"center_x": 0.2, "top": 1.35}
+            color: 1, 0, 0, 1
+
+        Label:
+            text: "Player 2: %d" % root.score2
+            font_size: "22sp"
+            pos_hint: {"center_x": 0.8, "top": 1.35}
+            color: 0, 0, 1, 1
+            opacity: 1 if root.num_players == 2 else 0
+
+        FishingLine:
+            id: p1_line
+            player_id: 1
+            x: root.width * 0.2
+            y: root.height 
+
+        FishingLine:
+            id: p2_line
+            player_id: 2
+            x: root.width * 0.8
+            y: root.height 
+            opacity: 1 if root.num_players == 2 else 0
+
+        Label:
+            text: "P1 (A/D/W) | P2 (Left/Right/Up)"
+            font_size: "16sp"
+            pos_hint: {"center_x": 0.5, "top": 1.4}
+            color: 1, 1, 1, 0.7
+
+
+<GameOverScreen>:
+    score1_text: score1_lbl
+    score2_text: score2_lbl
+
+    canvas.before:
+        Rectangle:
+            source: "images/gameover.jpg"
+            size: self.size
+            pos: self.pos
+
+    FloatLayout:
+        size: root.size
+        pos: root.pos
+
+        Label:
+            id: score1_lbl
+            text: "Player 1: 0"
+            font_size: "35sp"
+            color: 1, 1, 1, 1
+            pos_hint: {"center_x": 0.5, "center_y": 0.45}
+
+        Label:
+            id: score2_lbl
+            text: "Player 2: 0"
+            font_size: "35sp"
+            color: 0.8, 0.8, 1, 1
+            pos_hint: {"center_x": 0.5, "center_y": 0.38}
+
+        Button:
+            size_hint: 0.28, 0.12
+            pos_hint: {"center_x": 0.5, "center_y": 0.32}
+            background_color: 0, 0, 0, 0
+            on_press: root.restart_game()
+
+        Button:
+            size_hint: 0.25, 0.10
+            pos_hint: {"center_x": 0.5, "center_y": 0.18}
+            background_color: 0, 0, 0, 0
+            on_press: root.go_menu()
