@@ -7,6 +7,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
 from kivy.animation import Animation
 import random
+from functools import partial
 
 NUM_FISH = 10
 kivy.require("2.3.1")
@@ -23,8 +24,8 @@ FISH_TYPES = [
         "name": "Ikan Besar",
         "size": 450,
         "weight": 10,
-        "image_right": "images\ikan hijau KANAN.png",
-        "image_left": "images\ikan hijau KIRI.png"
+        "image_right": "images/ikan hijau KANAN.png",
+        "image_left": "images/ikan hijau KIRI.png"
     },
     {
         "name": "Ikan Sedang",
@@ -45,6 +46,7 @@ class Fish(Widget):
     is_caught = BooleanProperty(False)
     is_moving = BooleanProperty(True)
     direction = NumericProperty(1)  # 1 = kanan, -1 = kiri
+    caught_image = StringProperty("")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -114,12 +116,15 @@ class Fish(Widget):
 class FishingLine(Widget):
     player_id = NumericProperty(0)
     is_casting = BooleanProperty(False)
-    is_holding_fish = BooleanProperty(False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.caught_fish = None 
 
     def get_hook_rect(self):
         hook_size = 30
         hook_x = self.center_x - hook_size / 2
-        hook_y = self.y - hook_size  
+        hook_y = self.y - 150 + 20 
         return (hook_x, hook_y, hook_size, hook_size)
 
     def move_left(self):
@@ -214,11 +219,7 @@ class GameScreen(Screen):
             return
         fish_widget.is_caught = True
         fish_widget.is_moving = False
-        line_widget.is_holding_fish = True
-
-        # Lompatan kecil saat tertangkap
-        anim_jump = Animation(y=fish_widget.y + 200, duration=1.5) + Animation(y=fish_widget.y, duration=0.1)
-        anim_jump.start(fish_widget)
+        Animation.cancel_all(fish_widget)
 
         score = fish_widget.weight
         if line_widget.player_id == 1:
@@ -226,25 +227,31 @@ class GameScreen(Screen):
         else:
             self.score2 += score
 
-        # Angkat ikan
-        anim_up = Animation(y=Window.height * 0.75, duration=1.5, t='in_out_quad')
         line_widget.caught_fish = fish_widget
-        anim_up.bind(on_complete=self.finish_catch)
-        anim_up.start(line_widget)
 
-    def finish_catch(self, anim, line_widget):
-        fish = getattr(line_widget, 'caught_fish', None)
-        if not fish:
-            line_widget.is_casting = False
-            return
-        if 'fish_layer' in self.ids and fish.parent == self.ids.fish_layer:
-            self.ids.fish_layer.remove_widget(fish)
-        if fish in self.fishes:
-            self.fishes.remove(fish)
-        delattr(line_widget, 'caught_fish')
+        hook_x, hook_y, _, _ = line_widget.get_hook_rect()
+        fish_widget.x = hook_x - (fish_widget.width - 30) / 2  # center di bawah kail
+        fish_widget.y = hook_y - fish_widget.height
+
+        target_y = Window.height * 0.75
+        duration = 1.5
+
+         # Animasi kail naik
+        anim_line = Animation(y=target_y, duration=duration, t='in_out_quad')
+        anim_line.start(line_widget)
+
+    # Animasi ikan mengikuti kail (naik bersama)
+        anim_fish = Animation(y=target_y - fish_widget.height - 30, duration=duration, t='in_out_quad')
+        anim_fish.bind(on_complete=partial(self.finish_catch, line_widget, fish_widget))
+        anim_fish.start(fish_widget)
+
+    def finish_catch(self, line_widget, fish_widget, *args):
+    # Ikan sudah dihapus dari self.fishes di catch_fish, jadi tidak perlu hapus lagi
+        if fish_widget.parent:
+            self.ids.fish_layer.remove_widget(fish_widget)
         self.spawn_new_fish()
+        line_widget.caught_fish = None
         line_widget.is_casting = False
-        line_widget.is_holding_fish = False
 
     def end_game(self):
         Clock.unschedule(self.update)

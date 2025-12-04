@@ -12,14 +12,9 @@
     size: 20, 80
     canvas:
         Rectangle:
-            source: "images/KAIL MERAH.png"  # ← ganti dengan path gambarmu
-            pos: self.center_x - 15, self.y - 30  # sesuaikan offset
-            size: (120, 120)
-        Color:
-            rgba: 0.5, 0.5, 0.5, 1
-        Line:
-            points: self.center_x, self.top + 30, self.center_x, self.y
-            width: 1
+            source: "images/tali kail merah.png" if root.player_id == 1 else "images/tali kail biru.png"
+            pos: self.center_x - 75, self.y - 150
+            size: 150, 150
         
 <MenuScreen>:
     Image:
@@ -162,12 +157,12 @@
 
         Button:
             size_hint: 0.28, 0.12
-            pos_hint: {"center_x": 0.5, "center_y": 0.32}
-            background_color: 0, 0, 0, 0
+            pos_hint: {"center_x": 0.5, "center_y": 0.358}
+            background_color: 0, 0, 0, 0 
             on_press: root.restart_game()
 
         Button:
             size_hint: 0.25, 0.10
-            pos_hint: {"center_x": 0.5, "center_y": 0.18}
+            pos_hint: {"center_x": 0.5, "center_y": 0.12}
             background_color: 0, 0, 0, 0
             on_press: root.go_menu()
