@@ -15,24 +15,24 @@ kivy.require("2.3.1")
 FISH_TYPES = [
     {
         "name": "Ikan Biasa",
-        "size": 200,
+        "size": 300,
         "weight": 1,
-        "image_right": "images/IKAN OREN 1 KANAN.png",
-        "image_left": "images/IKAN OREN 1 KIRI.png"
+        "image_right": "images/IKAN KECIL 1 KANAN.png",
+        "image_left": "images/IKAN KECIL 1 KIRI.png"
     },
     {
         "name": "Ikan Besar",
-        "size": 450,
+        "size": 500,
         "weight": 10,
-        "image_right": "images/ikan hijau KANAN.png",
-        "image_left": "images/ikan hijau KIRI.png"
+        "image_right": "images/IKAN BESAR 10 KANAN.png",
+        "image_left": "images/IKAN BESAR 10 KIRI.png"
     },
     {
         "name": "Ikan Sedang",
-        "size": 300,
+        "size": 350,
         "weight": 3,
-        "image_right": "images/IKAN KUNING 2 KANAN.png",
-        "image_left": "images/ikan kuning 2 KIRI.png"
+        "image_right": "images/IKAN SEDANG 3 KANAN.png",
+        "image_left": "images/IKAN SEDANG 3 KIRI.png"
     },
 ]
 
@@ -212,7 +212,7 @@ class GameScreen(Screen):
     def update_time(self, dt):
         self.time_left -= 1
         if self.time_left <= 0:
-            self.end_game()
+            self.end_game()     
 
     def catch_fish(self, line_widget, fish_widget):
         if fish_widget.is_caught:
@@ -230,23 +230,20 @@ class GameScreen(Screen):
         line_widget.caught_fish = fish_widget
 
         hook_x, hook_y, _, _ = line_widget.get_hook_rect()
-        fish_widget.x = hook_x - (fish_widget.width - 30) / 2  # center di bawah kail
+        fish_widget.x = hook_x - (fish_widget.width - 30) / 2  
         fish_widget.y = hook_y - fish_widget.height
 
         target_y = Window.height * 0.75
         duration = 1.5
 
-         # Animasi kail naik
         anim_line = Animation(y=target_y, duration=duration, t='in_out_quad')
         anim_line.start(line_widget)
 
-    # Animasi ikan mengikuti kail (naik bersama)
         anim_fish = Animation(y=target_y - fish_widget.height - 30, duration=duration, t='in_out_quad')
         anim_fish.bind(on_complete=partial(self.finish_catch, line_widget, fish_widget))
         anim_fish.start(fish_widget)
 
     def finish_catch(self, line_widget, fish_widget, *args):
-    # Ikan sudah dihapus dari self.fishes di catch_fish, jadi tidak perlu hapus lagi
         if fish_widget.parent:
             self.ids.fish_layer.remove_widget(fish_widget)
         self.spawn_new_fish()

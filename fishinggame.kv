@@ -18,7 +18,7 @@
         
 <MenuScreen>:
     Image:
-        source: "images/QUICK HOOK.png"
+        source: "images/QUICK HOOK AKHIR.png"
         allow_stretch: True
         keep_ratio: False
         size: root.size
@@ -92,7 +92,7 @@
             text: "Time: %ds" % root.time_left
             font_size: "30sp"
             pos_hint: {"center_x": 0.5, "top": 1.45}
-            color: 1, 1, 1, 1
+            color: 0, 0, 0, 1
 
         Label:
             text: "Player 1: %d" % root.score1
@@ -121,10 +121,10 @@
             opacity: 1 if root.num_players == 2 else 0
 
         Label:
-            text: "P1 (A/D/W) | P2 (Left/Right/Up)"
+            text: "P1 (A(kiri)/D(kanan)/W(memancing)) | P2 (Left(kiri)/Right(kanan)/Up(memancing))"
             font_size: "16sp"
             pos_hint: {"center_x": 0.5, "top": 1.4}
-            color: 1, 1, 1, 0.7
+            color: 0, 0, 0, 1
 
 
 <GameOverScreen>:
@@ -156,8 +156,8 @@
             pos_hint: {"center_x": 0.5, "center_y": 0.38}
 
         Button:
-            size_hint: 0.28, 0.12
-            pos_hint: {"center_x": 0.5, "center_y": 0.358}
+            size_hint: 0.25, 0.10
+            pos_hint: {"center_x": 0.5, "center_y": 0.2}
             background_color: 0, 0, 0, 0 
             on_press: root.restart_game()
 
